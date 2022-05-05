@@ -2,13 +2,15 @@
 const vsSource = 
 `#version 300 es
 in vec3 aVertexPosition;
+in mat4 aTransform;
+
 
 uniform mat4 uProjection;
-uniform mat4 uTransform;
 uniform mat4 uView;
+uniform vec3 uCamPos;
 
 void main() {
-  gl_Position = uProjection * uView * uTransform * vec4(aVertexPosition, 1.0);
+  gl_Position = uProjection * uView * aTransform * vec4(aVertexPosition, 1.0);
 }
 `;
 
@@ -17,10 +19,13 @@ const fsSource =
 `#version 300 es
 precision highp float;
 
+uniform vec3 uDiffuseVal;
+
 out vec4 oColour;
 
 void main() {
-    oColour = vec4(1.0, 0.0, 0.0, 1.0);
+
+    oColour = vec4(uDiffuseVal, 1.0);
   }
 `;
 
@@ -34,14 +39,15 @@ class MainShader extends ShaderProgram{
         this.info = {
             program: this.program,
             //set any attrib locations here
-            attribLocations:{
-                vertexPosition: this.gl.getAttribLocation(this.program, "aVertexPosition"),
+            attribs:{
+                transformMatrix: this.gl.getAttribLocation(this.program, "aTransform"),
+                vertexPositions: this.gl.getAttribLocation(this.program, "aVertexPosition"),
             },
             //set uniforms
-            uniformLocations:{
+            uniforms:{
                 projection: this.gl.getUniformLocation(this.program, "uProjection"),
-                transform: this.gl.getUniformLocation(this.program, "uTransform"),
                 view: this.gl.getUniformLocation(this.program, "uView"),
+                diffuse : this.gl.getUniformLocation(this.program, "uDiffuseVal"), 
             },
         };
     }

@@ -17,7 +17,7 @@ class App{
         if (gl === null) {
             alert("ERROR INITIALIZING WEBGL!");
         }
-    
+
         //the state of this application
         this.state = {
             gl: gl,
@@ -26,6 +26,8 @@ class App{
             deltaTime: 0,
             camera: null,
             objects: {
+                exampleCube: null,
+                lights: [],
             },
             shaders: {
                 mainShader: null,
@@ -44,9 +46,17 @@ class App{
         this.state.shaders.mainShader = new MainShader(this.state.gl);
     
         //add our camera to our scene and give it a location, front and up vector
-        this.state.camera = new Camera(vec3.fromValues(-25.5, 39.5, 26.0), vec3.fromValues(0.7, -0.7, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
-  
+        this.state.camera = new Camera(vec3.fromValues(-5, 15, 0), vec3.fromValues(0, 0, 0), vec3.fromValues(0.0, 1.0, 0.0));
 
+        //add our example cubes
+        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader, vec3.fromValues(0.25, 0.25, 0.25), 5);
+
+        //add example cubes positions
+        var pos = vec3.fromValues(0, 0, 0)
+        for(var i = 0; i < this.state.objects.exampleCube.instances; i++){
+            pos[0] += 7.5;
+            vec3.copy(this.state.objects.exampleCube.positions[i], pos);
+        }
 
     }
 
@@ -57,11 +67,11 @@ class App{
         this.state.deltaTime = deltaTime;
         this.state.time += this.state.deltaTime;
 
-      
+        //update our example cubes
+        this.state.objects.exampleCube.updateInstances(deltaTime);
 
         //move camera and get the view matrix
         this.state.camera.move(deltaTime);
-        //console.log(this.state.camera.position);
         let viewMatrix = mat4.create();
         let front = vec3.create();
         vec3.add(front, this.state.camera.position, this.state.camera.front);
@@ -82,18 +92,22 @@ class App{
             100.0
         );
 
-       //use our shader program
-       this.state.gl.useProgram(this.state.shaders.mainShader.program);
-       //update view and projection unifomrs
-       this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniformLocations.view, viewMatrix);
-       this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniformLocations.projection, projectionMatrix);
-
+        //use our shader program
+        this.state.gl.useProgram(this.state.shaders.mainShader.program);
+ 
+        //update global uniforms
+        this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniforms.view, viewMatrix);
+        this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniforms.projection, projectionMatrix);
+        
 
     }
 
     //render calls go here
     onRender(){
-       
+
+        //render our cubes
+        this.state.objects.exampleCube.render();
+      
     }
 
     //start of the frame, things that happen before the 
