@@ -4,23 +4,19 @@ class RenderObject{
         this.gl = gl;
         //shader program
         this.shader = shader;
- 
-        //how many we want to render
-        this.instances = 0;
-
         //max amount to render
         this.max = max;
-
         //holds all instances
         this.instances = []
         //buffer data for instances
         this.instanceBufferData = {
             transform: [],
-            colour: []
+            colour: [],
+            normal: [],
         };
     }
 
-    initBuffers(vertexPositions, indices){
+    initBuffers(vertexPositions, vertexNormals, indices){
         //create and bind the current vao
         this.vao = this.gl.createVertexArray();
         this.gl.bindVertexArray(this.vao);
@@ -38,6 +34,20 @@ class RenderObject{
             0
         );
         this.gl.enableVertexAttribArray(this.shader.info.attribs.vertexPositions);
+
+        //create our normal buffer
+        var vertexNormalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexNormalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexNormals), this.gl.STATIC_DRAW);
+        this.gl.vertexAttribPointer(
+            this.shader.info.attribs.vertexNormals,
+            3, 
+            this.gl.FLOAT, 
+            false, 
+            0, 
+            0
+        );
+        this.gl.enableVertexAttribArray(this.shader.info.attribs.vertexNormals);
         
         
         //buffer for indexed drawing
@@ -69,6 +79,28 @@ class RenderObject{
             this.gl.vertexAttribDivisor(location, 1);
         }
 
+        //do the normal matrix instanced buffer
+        this.normalMatBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalMatBuffer);
+        //create bufffer big enough
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(16 * 4 * this.max), this.gl.DYNAMIC_DRAW);
+        
+        //setup attribs
+        for(var i = 0; i < 4; i++){
+            var location = this.shader.info.attribs.normalMatrix + i;
+            this.gl.enableVertexAttribArray(location);
+            var offset = i * 16;
+            this.gl.vertexAttribPointer(
+                location, 
+                4, 
+                this.gl.FLOAT, 
+                false, 
+                4 * 16, 
+                offset
+            );
+            this.gl.vertexAttribDivisor(location, 1);
+        }
+        
         
         //do our instanced colour buffer
         this.colourBuffer = this.gl.createBuffer();

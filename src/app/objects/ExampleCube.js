@@ -34,6 +34,40 @@ class ExampleCube extends RenderObject{
             0.0 ,1.0, 0.0
         ];
 
+        this.vertexNormals = [
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
+
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
+            
+
+            -1.0, 0.0, 0.0, 
+            -1.0, 0.0, 0.0, 
+            -1.0, 0.0, 0.0, 
+            -1.0, 0.0, 0.0, 
+
+            1.0, 0.0, 0.0, 
+            1.0, 0.0, 0.0, 
+            1.0, 0.0, 0.0, 
+            1.0, 0.0, 0.0, 
+
+        ];
+
          this.indices = [
             0,  1,  2,      0,  2,  3,
             4,  5,  6,      4,  6,  7,   
@@ -43,7 +77,7 @@ class ExampleCube extends RenderObject{
             20, 21, 22,     21, 22, 23
          ];
         
-        this.initBuffers(this.vertexPositions, this.indices);
+        this.initBuffers(this.vertexPositions, this.vertexNormals, this.indices);
     }
 
     //if objects need to be updated each frame, do it here
@@ -55,23 +89,31 @@ class ExampleCube extends RenderObject{
 
         //update each instance and add its required data to the buffers for updating
         var transforms = [];
+        var normalMats = [];
         var colours = [];
         this.instances.forEach( (instance, i) => {
             var transform = mat4.create();
+            var normalMat = mat4.create();
 
             //perform instance transforms
             mat4.translate(transform, transform, instance.position);
-            mat4.rotate(instance.rotation, instance.rotation, degToRad(45) * i * deltaTime, vec3.fromValues(1, 1, 1));
+            mat4.rotate(instance.rotation, instance.rotation, degToRad((45 * i) / 2.5) * deltaTime, vec3.fromValues(1, 1, 1));
             mat4.mul(transform, transform, instance.rotation);
             mat4.scale(transform, transform, instance.scale);
 
+            //update normal matrix
+            mat4.transpose(normalMat, transform);
+            mat4.invert(normalMat, normalMat);
+
             //add buffer to instance buffers
             transforms.push(transform);
+            normalMats.push(normalMat);
             colours.push(instance.colour);
         })
         //update and flatten each instance buffer
         this.instanceBufferData.transform = flatten(transforms);
         this.instanceBufferData.colour = flatten(colours);
+        this.instanceBufferData.normal = flatten(normalMats);
     }
 
     renderInstances(){
@@ -92,6 +134,10 @@ class ExampleCube extends RenderObject{
         //update our colour buffers
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colourBuffer);
         this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceBufferData.colour);
+
+        //update normal matrix buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalMatBuffer);
+        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceBufferData.normal);
 
         //instanced rendering
         this.gl.drawElementsInstanced(

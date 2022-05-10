@@ -31,6 +31,20 @@ class ShaderProgram{
         return shader;
     }
 
+    checkInfo(attribs, uniforms){
+        for(var attrib in attribs){
+            if(attribs[attrib] === -1){
+                console.log("ERROR: ATTRIB " + attrib + " NOT FOUND");
+            }
+        }
+
+        for(var uniform in uniforms){
+            if(uniforms[uniform] === -1){
+                console.log("ERROR: UNIFORM " + uniform + " NOT FOUND");
+            }
+        }
+    }
+
     setMat4(location, uniform){
         this.gl.uniformMatrix4fv(location, false, uniform);
     }

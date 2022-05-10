@@ -27,7 +27,7 @@ class App{
             camera: null,
             objects: {
                 exampleCube: null,
-                lights: [],
+                light: null,
             },
             shaders: {
                 mainShader: null,
@@ -65,6 +65,18 @@ class App{
             pos[2] += 10;
         }
 
+        //add a new scene light
+        this.state.objects.light = new Light(
+            "SceneLight",
+            vec3.fromValues(0.0, 10.0, 0.0),
+            vec3.fromValues(1, 1, 1),
+            2.5, 
+            5.0, 
+            this.state.gl, 
+            this.state.shaders.mainShader
+        );
+       
+
     }
 
     //runs every frame, updating objects and moving around 
@@ -79,7 +91,7 @@ class App{
         var view = this.state.camera.viewMatrix();
  
         //setup projection matrix
-        let projectionMatrix = mat4.create();
+        var projectionMatrix = mat4.create();
         mat4.perspective(
             projectionMatrix, 
             degToRad(45.0),
@@ -90,6 +102,9 @@ class App{
 
         //update our example cubes
         this.state.objects.exampleCube.updateInstances(deltaTime, projectionMatrix, view);
+
+        //update scene lights
+        this.state.objects.light.update(this.state.camera.position);
     }
 
     //render calls go here
