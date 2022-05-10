@@ -46,7 +46,7 @@ class App{
         this.state.shaders.mainShader = new MainShader(this.state.gl);
     
         //add our camera to our scene and give it a location, front and up vector
-        this.state.camera = new Camera(vec3.fromValues(-18.5, 35.0, -2.5), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
+        this.state.camera = new Camera(vec3.fromValues(-25 ,30, -20), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
 
         //add our example cubes
         var maxCubes = 5;
@@ -62,7 +62,7 @@ class App{
                 position: vec3.fromValues(pos[0], pos[1], pos[2]),
                 scale: vec3.fromValues(i + 0.5, i + 0.5, i + 0.5)
             });
-            pos[2] += 10;
+            pos[2] -= 10;
         }
 
         //add a new scene light

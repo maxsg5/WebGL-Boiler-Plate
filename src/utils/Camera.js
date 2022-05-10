@@ -6,7 +6,7 @@ class Camera{
         this.yaw = 0.0;
         this.pitch = -45.0;
         this.zoom = 45.0;
-        this.speed = 5.0;
+        this.speed = 10.0;
         this.keys = {
             keyW : false,
             keyA: false,
