@@ -7,3 +7,7 @@ Things to note:
 * The title and canvas ID can be changed in index.html
 * New files must be added as a source file in index.html
 * This structure is intended for 3D rendering applications, so those will be the settings used
+* When adding objects to render, they minimally need:
+    - vertex positions
+    - vertex normals
+    - vertex indices
