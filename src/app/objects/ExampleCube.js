@@ -1,6 +1,6 @@
 class ExampleCube extends RenderObject{
-    constructor(gl, shader, colour, instances){
-        super(gl, shader, colour, instances);
+    constructor(gl, shader, max){
+        super(gl, shader, max);
 
         this.vertexPositions = [
             0.0, 0.0, 0.0,
@@ -48,33 +48,42 @@ class ExampleCube extends RenderObject{
 
     //if objects need to be updated each frame, do it here
     updateInstances(deltaTime){
-        for(var i = 0; i < this.instances; i++){
-            this.transforms[i] = mat4.create();
 
-            //perform transformations, note the order
-            mat4.translate(this.transforms[i], this.transforms[i], this.positions[i]);
-            mat4.rotate(this.rotations[i], this.rotations[i], degToRad(45) * i * deltaTime, vec3.fromValues(1, 1, 1));
-            mat4.mul(this.transforms[i], this.transforms[i], this.rotations[i]);
-            mat4.scale(this.transforms[i], this.transforms[i], vec3.fromValues(i + 0.5, i + 0.5, i + 0.5));
-        }
+        //update each instance and add its required data to the buffers for updating
+        var transforms = [];
+        var colours = [];
+        this.instances.forEach( (instance, i) => {
+            var transform = mat4.create();
 
-        //convert our array of matricies and normals into one contiguous array of bytes
-        this.transformData = new Float32Array(this.transforms.map(transform => [...transform]).flat());
+            //perform instance transforms
+            mat4.translate(transform, transform, instance.position);
+            mat4.rotate(instance.rotation, instance.rotation, degToRad(45) * i * deltaTime, vec3.fromValues(1, 1, 1));
+            mat4.mul(transform, transform, instance.rotation);
+            mat4.scale(transform, transform, instance.scale);
+
+            //add buffer to instance buffers
+            transforms.push(transform);
+            colours.push(instance.colour);
+        })
+        //update and flatten each instance buffer
+        this.instanceBufferData.transform = flatten(transforms);
+        this.instanceBufferData.colour = flatten(colours);
     }
 
-    render(){
+    renderInstances(){
         //use our shader program
         this.gl.useProgram(this.shader.program);
-
-        //update uniforms
-        this.shader.setVec3(this.shader.info.uniforms.diffuse, this.colour);
 
         ///bind our vao for rendering
         this.gl.bindVertexArray(this.vao);
 
         //update our transform buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.transformBuffer);
-        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.transformData);
+        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceBufferData.transform);
+
+        //update our colour buffers
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colourBuffer);
+        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.instanceBufferData.colour);
 
         //instanced rendering
         this.gl.drawElementsInstanced(
@@ -82,7 +91,7 @@ class ExampleCube extends RenderObject{
             this.indices.length, 
             this.gl.UNSIGNED_SHORT, 
             0,
-            this.instances
+            this.instances.length,
         );
         //unbind our vao once done
         this.gl.bindVertexArray(null);

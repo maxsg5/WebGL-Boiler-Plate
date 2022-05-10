@@ -1,21 +1,23 @@
 class RenderObject{
-    constructor(gl, shader, colour, instances){
+    constructor(gl, shader, max){
         //context
         this.gl = gl;
         //shader program
         this.shader = shader;
-        //ambient, diffuse, specular
-        this.colour = colour;
+ 
         //how many we want to render
-        this.instances = instances;
+        this.instances = 0;
 
-        //instance positions, rotations, scales
-        this.positions = [];
-        this.rotations = [];
-        this.scales = [];
+        //max amount to render
+        this.max = max;
 
-        //transform matrix per instance
-        this.transforms = [];
+        //holds all instances
+        this.instances = []
+        //buffer data for instances
+        this.instanceBufferData = {
+            transform: [],
+            colour: []
+        };
     }
 
     initBuffers(vertexPositions, indices){
@@ -37,26 +39,17 @@ class RenderObject{
         );
         this.gl.enableVertexAttribArray(this.shader.info.attribs.vertexPositions);
         
+        
         //buffer for indexed drawing
         let ibo = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, ibo);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW)
-        
-        //add new position, rotationm, scale and transform per instance
-        for(var i = 0; i < this.instances; i++){
-            this.positions.push(vec3.create());
-            this.rotations.push(mat4.create());
-            this.scales.push(vec3.fromValues(1, 1, 1));
-            this.transforms.push(mat4.create());
-        }
-
-        //convert our array of matricies into one contiguous array of bytes
-        this.transformData = new Float32Array(this.transforms.map(transform => [...transform]).flat());
 
         //make these attributes incase we need to modify this buffer data later
         this.transformBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.transformBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.transformData, this.gl.DYNAMIC_DRAW);
+        //create buffer big enough for max transforms
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(16 * 4 * this.max), this.gl.DYNAMIC_DRAW);
         
         //each matrix is 4 attributes
         for(var i = 0; i < 4; i++){
@@ -76,9 +69,32 @@ class RenderObject{
             this.gl.vertexAttribDivisor(location, 1);
         }
 
+        
+        //do our instanced colour buffer
+        this.colourBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colourBuffer);
+         //create buffer big enough for max colours
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(3 * 4 * this.max), this.gl.DYNAMIC_DRAW);
+
+        this.gl.vertexAttribPointer(
+            this.shader.info.attribs.vertexColours, 
+            3, 
+            this.gl.FLOAT, 
+            false, 
+            0, 
+            0
+        );
+        this.gl.enableVertexAttribArray(this.shader.info.attribs.vertexColours);
+        this.gl.vertexAttribDivisor(this.shader.info.attribs.vertexColours, 1);
+        
         //good practice to unbind the vao once done
         this.gl.bindVertexArray(null);
+    }
 
+    addInstance(instance){
+        if(this.instances.length < this.max){
+            this.instances.push(instance)
+        }
     }
 
 }

@@ -46,16 +46,23 @@ class App{
         this.state.shaders.mainShader = new MainShader(this.state.gl);
     
         //add our camera to our scene and give it a location, front and up vector
-        this.state.camera = new Camera(vec3.fromValues(-5, 15, 0), vec3.fromValues(0, 0, 0), vec3.fromValues(0.0, 1.0, 0.0));
+        this.state.camera = new Camera(vec3.fromValues(-18.5, 35.0, -2.5), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
 
         //add our example cubes
-        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader, vec3.fromValues(0.25, 0.25, 0.25), 5);
+        var maxCubes = 5;
+        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader, maxCubes);
 
-        //add example cubes positions
+        //add example cube instances
         var pos = vec3.fromValues(0, 0, 0)
-        for(var i = 0; i < this.state.objects.exampleCube.instances; i++){
-            pos[0] += 7.5;
-            vec3.copy(this.state.objects.exampleCube.positions[i], pos);
+        for(var i = 0; i < maxCubes; i++){
+            this.state.objects.exampleCube.addInstance({
+                type: "exampleCube",
+                colour: vec3.fromValues(randomFloat(0.0, 1.0), randomFloat(0.0, 1.0), randomFloat(0.0, 1.0)),
+                rotation: mat4.create(),
+                position: vec3.fromValues(pos[0], pos[1], pos[2]),
+                scale: vec3.fromValues(i + 0.5, i + 0.5, i + 0.5)
+            });
+            pos[0] += 10;
         }
 
     }
@@ -67,18 +74,14 @@ class App{
         this.state.deltaTime = deltaTime;
         this.state.time += this.state.deltaTime;
 
-        //update our example cubes
-        this.state.objects.exampleCube.updateInstances(deltaTime);
-
         //move camera and get the view matrix
         this.state.camera.move(deltaTime);
         let viewMatrix = mat4.create();
-        let front = vec3.create();
-        vec3.add(front, this.state.camera.position, this.state.camera.front);
+        vec3.add(this.state.camera.front, this.state.camera.position, this.state.camera.front);
         mat4.lookAt(
             viewMatrix,
             this.state.camera.position,
-            front,
+            this.state.camera.front,
             this.state.camera.up,
         );
 
@@ -91,6 +94,11 @@ class App{
             0.1, 
             100.0
         );
+
+        
+
+        //update our example cubes
+        this.state.objects.exampleCube.updateInstances(deltaTime);
 
         //use our shader program
         this.state.gl.useProgram(this.state.shaders.mainShader.program);
@@ -106,7 +114,7 @@ class App{
     onRender(){
 
         //render our cubes
-        this.state.objects.exampleCube.render();
+        this.state.objects.exampleCube.renderInstances();
       
     }
 

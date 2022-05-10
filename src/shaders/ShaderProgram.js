@@ -39,6 +39,10 @@ class ShaderProgram{
         this.gl.uniform3fv(location, uniform);
     }
 
+    setVec2(location, uniform){
+        this.gl.uniform2fv(location, uniform);
+    }
+
     setFloat(location, uniform){
         this.gl.uniform1f(location, uniform);
     }

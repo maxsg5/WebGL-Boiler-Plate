@@ -10,3 +10,12 @@ function shuffle(array){
         array[j] = temp;
     }
 }
+
+function flatten(array){
+    return new Float32Array(array.map(element => [...element]).flat())
+}
+
+
+function randomFloat(min, max){
+    return Math.random() * (max - min) + min;
+}
