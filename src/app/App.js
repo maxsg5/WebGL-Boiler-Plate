@@ -46,7 +46,7 @@ class App{
         this.state.shaders.mainShader = new MainShader(this.state.gl);
     
         //add our camera to our scene and give it a location, front and up vector
-        this.state.camera = new Camera(vec3.fromValues(-18.5, 35.0, -2.5), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 1.0, 0.0));
+        this.state.camera = new Camera(vec3.fromValues(-18.5, 35.0, -2.5), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
 
         //add our example cubes
         var maxCubes = 5;
@@ -62,7 +62,7 @@ class App{
                 position: vec3.fromValues(pos[0], pos[1], pos[2]),
                 scale: vec3.fromValues(i + 0.5, i + 0.5, i + 0.5)
             });
-            pos[0] += 10;
+            pos[2] += 10;
         }
 
     }
@@ -76,15 +76,8 @@ class App{
 
         //move camera and get the view matrix
         this.state.camera.move(deltaTime);
-        let viewMatrix = mat4.create();
-        vec3.add(this.state.camera.front, this.state.camera.position, this.state.camera.front);
-        mat4.lookAt(
-            viewMatrix,
-            this.state.camera.position,
-            this.state.camera.front,
-            this.state.camera.up,
-        );
-
+        var view = this.state.camera.viewMatrix();
+ 
         //setup projection matrix
         let projectionMatrix = mat4.create();
         mat4.perspective(
@@ -95,27 +88,14 @@ class App{
             100.0
         );
 
-        
-
         //update our example cubes
-        this.state.objects.exampleCube.updateInstances(deltaTime);
-
-        //use our shader program
-        this.state.gl.useProgram(this.state.shaders.mainShader.program);
- 
-        //update global uniforms
-        this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniforms.view, viewMatrix);
-        this.state.shaders.mainShader.setMat4(this.state.shaders.mainShader.info.uniforms.projection, projectionMatrix);
-        
-
+        this.state.objects.exampleCube.updateInstances(deltaTime, projectionMatrix, view);
     }
 
     //render calls go here
     onRender(){
-
         //render our cubes
         this.state.objects.exampleCube.renderInstances();
-      
     }
 
     //start of the frame, things that happen before the 

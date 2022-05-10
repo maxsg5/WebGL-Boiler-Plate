@@ -112,4 +112,12 @@ class Camera{
         }
 
     }
+
+    viewMatrix(){
+        var view = mat4.create();
+        var front = vec3.create();
+        vec3.add(front, this.position, this.front);
+        mat4.lookAt(view, this.position, front, this.up);
+        return view;
+    }
 }

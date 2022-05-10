@@ -47,7 +47,11 @@ class ExampleCube extends RenderObject{
     }
 
     //if objects need to be updated each frame, do it here
-    updateInstances(deltaTime){
+    updateInstances(deltaTime, projection, view){
+
+        //update uniforms
+        this.projection = projection;
+        this.view = view;
 
         //update each instance and add its required data to the buffers for updating
         var transforms = [];
@@ -76,6 +80,10 @@ class ExampleCube extends RenderObject{
 
         ///bind our vao for rendering
         this.gl.bindVertexArray(this.vao);
+
+        //update uniforms
+        this.shader.setMat4(this.shader.info.uniforms.view, this.view);
+        this.shader.setMat4(this.shader.info.uniforms.projection, this.projection);
 
         //update our transform buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.transformBuffer);
