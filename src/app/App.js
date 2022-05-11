@@ -56,23 +56,41 @@ class App{
         var pos = vec3.fromValues(0, 0, 0)
         for(var i = 0; i < maxCubes; i++){
             this.state.objects.exampleCube.addInstance({
+                //the type of an instance specifies how it should be treated
                 type: "exampleCube",
+                //colour of the instance
                 colour: vec3.fromValues(randomFloat(0.0, 1.0), randomFloat(0.0, 1.0), randomFloat(0.0, 1.0)),
+                //rotation matrix for the instance, when rotating this is what is updated
                 rotation: mat4.create(),
+                //initial rotation angle of the object, if you dont want the object to rotate make this 0
+                theta: degToRad(45),
+                //position of the object in world space
                 position: vec3.fromValues(pos[0], pos[1], pos[2]),
-                scale: vec3.fromValues(i + 0.5, i + 0.5, i + 0.5)
+                //speed of object
+                speed: 2.0,
+                //size of the object
+                scale: vec3.fromValues(1, 1, 1),
+                //what do we want to scale by, used later
+                scaleFactor: 1.0,
             });
             pos[2] -= 10;
         }
 
         //add a new scene light
         this.state.objects.light = new Light(
+            //light label
             "SceneLight",
+            //position
             vec3.fromValues(0.0, 10.0, 0.0),
+            //colour
             vec3.fromValues(1, 1, 1),
+            //strength
             2.5, 
-            5.0, 
+            //shininess
+            5.0,
+            //current webgl context
             this.state.gl, 
+            //shader you want the light to use
             this.state.shaders.mainShader
         );
        
@@ -99,9 +117,38 @@ class App{
             0.1, 
             100.0
         );
+        
+        //give our cubes some new transformation data
+        var numCubes = this.state.objects.exampleCube.instances.length;
+        for(var i = 0; i < numCubes; i++){
+            //rotate
+            this.state.objects.exampleCube.rotate(vec3.fromValues(1, 1, 1), 15.0 * deltaTime * i, i);
 
-        //update our example cubes
-        this.state.objects.exampleCube.updateInstances(deltaTime, projectionMatrix, view);
+            //move 
+            var cube = this.state.objects.exampleCube.instances[i];
+            this.state.objects.exampleCube.translate(vec3.fromValues(cube.speed * deltaTime * i, cube.speed * deltaTime * i, 0), i);
+            if(cube.position[0] >= 10.0){
+                cube.speed *= -1;
+            }
+            if(cube.position[0] <= -10){
+                cube.speed *= -1
+            }
+
+            //scale
+            //uniform scaling so i only need to check one value of the scale vector
+            if(cube.scale[0] >= 5.0){
+                cube.scaleFactor = -deltaTime;
+            }
+            if(cube.scale[0] <= 1.0){
+                cube.scaleFactor = deltaTime;
+            }
+            //the axis represents how we want to scale, for uniform scaling use 1 for all axis
+            this.state.objects.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
+        }
+
+        //update our example cubes with whatever new transforms we did above
+        //this method will update our instances with whatever action is performed above
+        this.state.objects.exampleCube.updateInstances(projectionMatrix, view);
 
         //update scene lights
         this.state.objects.light.update(this.state.camera.position);
