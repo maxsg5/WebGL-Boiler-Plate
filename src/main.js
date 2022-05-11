@@ -13,8 +13,8 @@ function main(){
         then = now;
 
         app.startFrame();
-        app.onUpdate(deltaTime);
-        app.onRender();
+        app.update(deltaTime);
+        app.render();
         app.endFrame();
 
         requestAnimationFrame(render);

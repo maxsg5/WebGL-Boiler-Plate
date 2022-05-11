@@ -17,9 +17,11 @@ class App{
         if (this.gl === null) {
             alert("ERROR INITIALIZING WEBGL!");
         }
-        
+
         console.log("Initialization finished\n");
     }
+
+ 
 
     //runs once on app startup
     //you can add new objects to render here as well and perform 
@@ -79,9 +81,24 @@ class App{
         );
     }
 
+    //start of the frame, things that happen before the 
+    //frame is updated go here
+    startFrame(){
+        //background colour
+        this.gl.clearColor(0.5, 0.5, 0.5, 1.0);
+        //clear everything
+        this.gl.clearDepth(1.0);
+        //enable depth testing
+        this.gl.enable(this.gl.DEPTH_TEST);
+        //clear the depth and colour buffer
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        //render near things first
+        this.gl.depthFunc(this.gl.LEQUAL);
+    }
+
     //runs every frame, updating objects and moving around 
     //goes in here
-    onUpdate(deltaTime){
+    update(deltaTime){
         //update render time
         this.deltaTime = deltaTime;
         this.time += this.deltaTime;
@@ -130,7 +147,6 @@ class App{
                 this.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
             }
         }
-        
 
         //update our example cubes with whatever new transforms we did above
         //this method will update our instances with whatever action is performed above
@@ -141,25 +157,12 @@ class App{
     }
 
     //render calls go here
-    onRender(){
+    render(){
         //render our cubes
         this.exampleCube.renderInstances();
     }
 
-    //start of the frame, things that happen before the 
-    //frame is updated go here
-    startFrame(){
-        //background colour
-        this.gl.clearColor(0.5, 0.5, 0.5, 1.0);
-        //clear everything
-        this.gl.clearDepth(1.0);
-        //enable depth testing
-        this.gl.enable(this.gl.DEPTH_TEST);
-        //clear the depth and colour buffer
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        //render near things first
-        this.gl.depthFunc(this.gl.LEQUAL);
-    }
+    
 
     //end of the frame, can add post processing here
     endFrame(){
