@@ -80,8 +80,8 @@ class ExampleCube extends RenderObject{
         this.initBuffers(this.vertexPositions, this.vertexNormals, this.indices);
     }
 
-    //if objects need to be updated each frame, do it here
-    updateInstances(deltaTime, projection, view){
+    //updates each instances transforms
+    updateInstances(projection, view){
 
         //update uniforms
         this.projection = projection;
@@ -91,14 +91,21 @@ class ExampleCube extends RenderObject{
         var transforms = [];
         var normalMats = [];
         var colours = [];
-        this.instances.forEach( (instance, i) => {
+        this.instances.forEach( (instance) => {
             var transform = mat4.create();
             var normalMat = mat4.create();
+            var centroid = this.getCentroid();
 
-            //perform instance transforms
+            //move object to desired position
             mat4.translate(transform, transform, instance.position);
-            mat4.rotate(instance.rotation, instance.rotation, degToRad((45 * i) / 2.5) * deltaTime, vec3.fromValues(1, 1, 1));
+            //move object to centroid
+            mat4.translate(transform, transform, centroid);
+            //perform rotation
             mat4.mul(transform, transform, instance.rotation);
+            //move object back from centroid
+            vec3.negate(centroid, centroid);
+            mat4.translate(transform, transform, centroid);
+            //scale the object
             mat4.scale(transform, transform, instance.scale);
 
             //update normal matrix
