@@ -1,11 +1,11 @@
 class RenderObject{
-    constructor(gl, shader, max){
+    constructor(gl, shader){
         //context
         this.gl = gl;
         //shader program
         this.shader = shader;
         //max amount to render
-        this.max = max;
+        this.max = 10000;
         //holds all instances
         this.instances = []
         //buffer data for instances
@@ -150,10 +150,51 @@ class RenderObject{
         }
     }
 
+    //updates the buffer data with the new transforms, normals and colours
+    updateBufferData(){
+        //update the buffer
+        var transforms = [];
+        var normalMats = [];
+        var colours = [];
+        this.instances.forEach( (instance) => {
+            var transform = mat4.create();
+            var normalMat = mat4.create();
+            var centroid = this.getCentroid();
+
+            //move object to desired position
+            mat4.translate(transform, transform, instance.position);
+            //move object to centroid
+            mat4.translate(transform, transform, centroid);
+            //perform rotation
+            mat4.mul(transform, transform, instance.rotation);
+            //move object back from centroid
+            vec3.negate(centroid, centroid);
+            mat4.translate(transform, transform, centroid);
+            //scale the object
+            mat4.scale(transform, transform, instance.scale);
+
+            //update normal matrix
+            mat4.transpose(normalMat, transform);
+            mat4.invert(normalMat, normalMat);
+
+            //add buffer to instance buffers
+            transforms.push(transform);
+            normalMats.push(normalMat);
+            colours.push(instance.colour);
+        })
+        //update and flatten each instance buffer
+        this.instanceBufferData.transform = flatten(transforms);
+        this.instanceBufferData.colour = flatten(colours);
+        this.instanceBufferData.normal = flatten(normalMats);
+    }
+
     //adds new instance to render
     addInstance(instance){
         if(this.instances.length < this.max){
             this.instances.push(instance)
+        }
+        else{
+            console.log("MAXIMUM INSTANCES REACHED");
         }
     }
 

@@ -1,6 +1,6 @@
 class ExampleCube extends RenderObject{
-    constructor(gl, shader, max){
-        super(gl, shader, max);
+    constructor(gl, shader){
+        super(gl, shader);
 
         this.vertexPositions = [
             0.0, 0.0, 0.0,
@@ -80,47 +80,15 @@ class ExampleCube extends RenderObject{
         this.initBuffers(this.vertexPositions, this.vertexNormals, this.indices);
     }
 
-    //updates each instances transforms
+    //set specific instance uniforms and buffer data
     updateInstances(projection, view){
 
-        //update uniforms
+        //set uniforms
         this.projection = projection;
         this.view = view;
 
-        //update each instance and add its required data to the buffers for updating
-        var transforms = [];
-        var normalMats = [];
-        var colours = [];
-        this.instances.forEach( (instance) => {
-            var transform = mat4.create();
-            var normalMat = mat4.create();
-            var centroid = this.getCentroid();
-
-            //move object to desired position
-            mat4.translate(transform, transform, instance.position);
-            //move object to centroid
-            mat4.translate(transform, transform, centroid);
-            //perform rotation
-            mat4.mul(transform, transform, instance.rotation);
-            //move object back from centroid
-            vec3.negate(centroid, centroid);
-            mat4.translate(transform, transform, centroid);
-            //scale the object
-            mat4.scale(transform, transform, instance.scale);
-
-            //update normal matrix
-            mat4.transpose(normalMat, transform);
-            mat4.invert(normalMat, normalMat);
-
-            //add buffer to instance buffers
-            transforms.push(transform);
-            normalMats.push(normalMat);
-            colours.push(instance.colour);
-        })
-        //update and flatten each instance buffer
-        this.instanceBufferData.transform = flatten(transforms);
-        this.instanceBufferData.colour = flatten(colours);
-        this.instanceBufferData.normal = flatten(normalMats);
+        //update our buffer data for dynamic rendering
+        this.updateBufferData();
     }
 
     renderInstances(){
