@@ -8,31 +8,16 @@ class App{
         console.log("Initializing application");
     
         //get current canvas 
-        const canvas = document.querySelector("#WebGlApp");
+        this.canvas = document.querySelector("#WebGlApp");
     
         //init webgl
-        var gl = canvas.getContext("webgl2");
+        this.gl = this.canvas.getContext("webgl2");
     
         // Only continue if WebGL2 is available and working
-        if (gl === null) {
+        if (this.gl === null) {
             alert("ERROR INITIALIZING WEBGL!");
         }
-
-        //the state of this application
-        this.state = {
-            gl: gl,
-            canvas: canvas,
-            time: 0,
-            deltaTime: 0,
-            camera: null,
-            objects: {
-                exampleCube: null,
-                light: null,
-            },
-            shaders: {
-                mainShader: null,
-            },
-        };
+        
         console.log("Initialization finished\n");
     }
 
@@ -43,18 +28,18 @@ class App{
         console.log("Starting application\n");
 
         //initialize our state objects
-        this.state.shaders.mainShader = new MainShader(this.state.gl);
+        this.mainShader = new MainShader(this.gl);
     
         //add our camera to our scene and give it a location, front and up vector
-        this.state.camera = new Camera(vec3.fromValues(-25 ,30, -20), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
+        this.camera = new Camera(vec3.fromValues(-25 ,30, -20), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
 
         //create our example cube
-        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader);
+        this.exampleCube = new ExampleCube(this.gl, this.mainShader);
 
         //add example cube instances
         var pos = vec3.fromValues(0, 0, 0)
         for(var i = 0; i < 5; i++){
-            this.state.objects.exampleCube.addInstance({
+            this.exampleCube.addInstance({
                 //the type of an instance specifies how it should be treated
                 type: "exampleCube",
                 //colour of the instance
@@ -76,7 +61,7 @@ class App{
         }
 
         //add a new scene light
-        this.state.objects.light = new Light(
+        this.light = new Light(
             //light label
             "SceneLight",
             //position
@@ -88,48 +73,44 @@ class App{
             //shininess
             5.0,
             //current webgl context
-            this.state.gl, 
+            this.gl, 
             //shader you want the light to use
-            this.state.shaders.mainShader
+            this.mainShader
         );
-
-        console.log(this.state.objects.exampleCube)
-       
-
     }
 
     //runs every frame, updating objects and moving around 
     //goes in here
     onUpdate(deltaTime){
         //update render time
-        this.state.deltaTime = deltaTime;
-        this.state.time += this.state.deltaTime;
+        this.deltaTime = deltaTime;
+        this.time += this.deltaTime;
 
         //move camera and get the view matrix
-        this.state.camera.move(deltaTime);
-        var view = this.state.camera.viewMatrix();
+        this.camera.move(this.deltaTime);
+        var view = this.camera.viewMatrix();
  
         //setup projection matrix
         var projectionMatrix = mat4.create();
         mat4.perspective(
             projectionMatrix, 
             degToRad(45.0),
-            this.state.canvas.clientWidth / this.state.canvas.clientHeight,
+            this.canvas.clientWidth / this.canvas.clientHeight,
             0.1, 
             100.0
         );
         
         //give our cubes some new transformation data
-        var numCubes = this.state.objects.exampleCube.instances.length;
+        var numCubes = this.exampleCube.instances.length;
         for(var i = 0; i < numCubes; i++){
-            var cube = this.state.objects.exampleCube.instances[i];
+            var cube = this.exampleCube.instances[i];
             if(cube.type === "exampleCube"){
                 //rotate
-                this.state.objects.exampleCube.rotate(vec3.fromValues(1, 1, 1), 15.0 * deltaTime * i, i);
+                this.exampleCube.rotate(vec3.fromValues(1, 1, 1), 15.0 * deltaTime * i, i);
 
                 //move 
-                var cube = this.state.objects.exampleCube.instances[i];
-                this.state.objects.exampleCube.translate(vec3.fromValues(cube.speed * deltaTime * i, cube.speed * deltaTime * i, 0), i);
+                var cube = this.exampleCube.instances[i];
+                this.exampleCube.translate(vec3.fromValues(cube.speed * deltaTime * i, cube.speed * deltaTime * i, 0), i);
                 if(cube.position[0] >= 10.0){
                     cube.speed *= -1;
                 }
@@ -146,38 +127,38 @@ class App{
                     cube.scaleFactor = deltaTime;
                 }
                 //the axis represents how we want to scale, for uniform scaling use 1 for all axis
-                this.state.objects.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
+                this.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
             }
         }
         
 
         //update our example cubes with whatever new transforms we did above
         //this method will update our instances with whatever action is performed above
-        this.state.objects.exampleCube.updateInstances(projectionMatrix, view);
+        this.exampleCube.updateInstances(projectionMatrix, view);
 
         //update scene lights
-        this.state.objects.light.update(this.state.camera.position);
+        this.light.update(this.camera.position);
     }
 
     //render calls go here
     onRender(){
         //render our cubes
-        this.state.objects.exampleCube.renderInstances();
+        this.exampleCube.renderInstances();
     }
 
     //start of the frame, things that happen before the 
     //frame is updated go here
     startFrame(){
         //background colour
-        this.state.gl.clearColor(0.5, 0.5, 0.5, 1.0);
+        this.gl.clearColor(0.5, 0.5, 0.5, 1.0);
         //clear everything
-        this.state.gl.clearDepth(1.0);
+        this.gl.clearDepth(1.0);
         //enable depth testing
-        this.state.gl.enable(this.state.gl.DEPTH_TEST);
+        this.gl.enable(this.gl.DEPTH_TEST);
         //clear the depth and colour buffer
-        this.state.gl.clear(this.state.gl.COLOR_BUFFER_BIT | this.state.gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         //render near things first
-        this.state.gl.depthFunc(this.state.gl.LEQUAL);
+        this.gl.depthFunc(this.gl.LEQUAL);
     }
 
     //end of the frame, can add post processing here
