@@ -16,6 +16,7 @@ class RenderObject{
         };
     }
 
+    //initializes the objects buffer data
     initBuffers(vertexPositions, vertexNormals, indices){
         //create and bind the current vao
         this.vao = this.gl.createVertexArray();
@@ -123,10 +124,48 @@ class RenderObject{
         this.gl.bindVertexArray(null);
     }
 
+    //rotates an instance around the rotation axis by the given angle
+    rotate(rotationAxis, angle, instance){
+        var rotation = this.instances[instance].rotation;
+        mat4.rotate(rotation, rotation, degToRad(angle), rotationAxis);
+    }
+
+    //moves an instance around
+    translate(translationVector, instance){
+        var position = this.instances[instance].position;
+        vec3.add(position, position, translationVector);
+    }
+
+    //changes the instance size along the specified axis
+    scale(scaleAxis, scaleFactor, instance){
+        var scale = this.instances[instance].scale;
+        if(scaleAxis[0] === 1){
+            scale[0] *= scaleFactor;
+        }
+        if(scaleAxis[1] === 1){
+            scale[1] *= scaleFactor;
+        }
+        if(scaleAxis[2] === 1){
+            scale[2] *= scaleFactor;
+        }
+    }
+
+    //adds new instance to render
     addInstance(instance){
         if(this.instances.length < this.max){
             this.instances.push(instance)
         }
     }
 
+    //calculate the centroid of an objects vertex positions
+    getCentroid(){  
+        var centroid = vec3.fromValues(0, 0, 0);
+        var average = 1.0 / (this.vertexPositions.length / 3.0);
+        for(var i = 0; i < this.vertexPositions; i += 3){
+            var vertexPosition = vec3.fromValues(this.vertexPositions[i], this.vertexPositions[i + 1], this.vertexPositions[i + 2]);
+            vec3.add(centroid, centroid, vertexPosition);
+        }
+        vec3.scale(centroid, centroid, average);
+        return centroid;
+    }
 }
