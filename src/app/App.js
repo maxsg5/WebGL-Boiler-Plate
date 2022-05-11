@@ -48,13 +48,12 @@ class App{
         //add our camera to our scene and give it a location, front and up vector
         this.state.camera = new Camera(vec3.fromValues(-25 ,30, -20), vec3.fromValues(0.0, 0.0, -1.0), vec3.fromValues(0.0, 1.0, 0.0));
 
-        //add our example cubes
-        var maxCubes = 5;
-        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader, maxCubes);
+        //create our example cube
+        this.state.objects.exampleCube = new ExampleCube(this.state.gl, this.state.shaders.mainShader);
 
         //add example cube instances
         var pos = vec3.fromValues(0, 0, 0)
-        for(var i = 0; i < maxCubes; i++){
+        for(var i = 0; i < 5; i++){
             this.state.objects.exampleCube.addInstance({
                 //the type of an instance specifies how it should be treated
                 type: "exampleCube",
@@ -93,6 +92,8 @@ class App{
             //shader you want the light to use
             this.state.shaders.mainShader
         );
+
+        console.log(this.state.objects.exampleCube)
        
 
     }
@@ -121,30 +122,34 @@ class App{
         //give our cubes some new transformation data
         var numCubes = this.state.objects.exampleCube.instances.length;
         for(var i = 0; i < numCubes; i++){
-            //rotate
-            this.state.objects.exampleCube.rotate(vec3.fromValues(1, 1, 1), 15.0 * deltaTime * i, i);
-
-            //move 
             var cube = this.state.objects.exampleCube.instances[i];
-            this.state.objects.exampleCube.translate(vec3.fromValues(cube.speed * deltaTime * i, cube.speed * deltaTime * i, 0), i);
-            if(cube.position[0] >= 10.0){
-                cube.speed *= -1;
-            }
-            if(cube.position[0] <= -10){
-                cube.speed *= -1
-            }
+            if(cube.type === "exampleCube"){
+                //rotate
+                this.state.objects.exampleCube.rotate(vec3.fromValues(1, 1, 1), 15.0 * deltaTime * i, i);
 
-            //scale
-            //uniform scaling so i only need to check one value of the scale vector
-            if(cube.scale[0] >= 5.0){
-                cube.scaleFactor = -deltaTime;
+                //move 
+                var cube = this.state.objects.exampleCube.instances[i];
+                this.state.objects.exampleCube.translate(vec3.fromValues(cube.speed * deltaTime * i, cube.speed * deltaTime * i, 0), i);
+                if(cube.position[0] >= 10.0){
+                    cube.speed *= -1;
+                }
+                if(cube.position[0] <= -10){
+                    cube.speed *= -1
+                }
+
+                //scale
+                //uniform scaling so i only need to check one value of the scale vector
+                if(cube.scale[0] >= 5.0){
+                    cube.scaleFactor = -deltaTime;
+                }
+                if(cube.scale[0] <= 1.0){
+                    cube.scaleFactor = deltaTime;
+                }
+                //the axis represents how we want to scale, for uniform scaling use 1 for all axis
+                this.state.objects.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
             }
-            if(cube.scale[0] <= 1.0){
-                cube.scaleFactor = deltaTime;
-            }
-            //the axis represents how we want to scale, for uniform scaling use 1 for all axis
-            this.state.objects.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
         }
+        
 
         //update our example cubes with whatever new transforms we did above
         //this method will update our instances with whatever action is performed above
