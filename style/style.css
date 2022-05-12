@@ -1,0 +1,35 @@
+canvas{
+  position: absolute;
+  top: 5;
+  left: 0;
+  border-width: 10px;
+  border-style: ridge;
+  border-color: #555555;
+}
+
+#toolsPanel{
+    /* move panel to the right */
+    position:absolute; 
+    right:5em;
+    border-width: 10px;
+    border-style: ridge;
+    border-color: #555555;
+    background-color: rgb(0, 0, 0);
+}
+
+.color-picker{
+    position: relative;
+}
+.color-indicator{
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    background-color: #fff;
+    border-radius: 20px;
+    vertical-align: middle;
+}
+#color-picker{
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 40px;
+}

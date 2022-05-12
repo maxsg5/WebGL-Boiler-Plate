@@ -72,6 +72,30 @@ class App{
             pos[2] -= 10;
         }
 
+        //create our example pyramid
+        this.examplePyramid = new ExamplePyramid(this.gl, this.mainShader);
+        //add example pyramid instance
+        this.examplePyramid.addInstance({
+            //the type of an instance specifies how it should be treated
+            type: "examplePyramid",
+            //colour of the instance
+            colour: vec3.fromValues(randomFloat(0.0, 1.0), randomFloat(0.0, 1.0), randomFloat(0.0, 1.0)),
+            //rotation matrix for the instance, when rotating this is what is updated
+            rotation: mat4.create(),
+            //initial rotation angle of the object, if you dont want the object to rotate make this 0
+            theta: degToRad(0),
+            //position of the object in world space
+            position: vec3.fromValues(-5, 0, 0),
+            //speed of object
+            speed: 2.0,
+            //size of the object
+            scale: vec3.fromValues(1, 1, 1),
+            //what do we want to scale by, used later
+            scaleFactor: 1.0,
+        });
+
+
+
         //add a new scene light
         this.light = new Light(
             //light label
@@ -172,6 +196,10 @@ class App{
         //this method will update our instances with whatever action is performed above
         this.exampleCube.updateInstances(projectionMatrix, view);
 
+        //update our example pyramid with whatever new transforms we did above
+        //this method will update our instances with whatever action is performed above
+        this.examplePyramid.updateInstances(projectionMatrix, view);
+
         //update scene lights
         this.light.update(this.camera.position);
     }
@@ -186,6 +214,8 @@ class App{
     render(){
         //render our cubes
         this.exampleCube.renderInstances();
+        //render our pyramid
+        this.examplePyramid.renderInstances();
     }
 
     /**
