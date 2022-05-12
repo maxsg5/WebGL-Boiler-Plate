@@ -16,7 +16,17 @@ class RenderObject{
         };
     }
 
-    //initializes the objects buffer data
+    /**
+    * Sets up the required buffers for the render object in 
+    * order for proper rendering. The instanced buffers 
+    * are designed to be big enough to hold the max amount of
+    * instances
+    *
+    * @param {array} vertexPositions array of vertex positions
+    * @param {array} vertexNormals array of vertex normals
+    * @param {array} indices array of vertex indices / triangles
+    * @return {none}
+    */
     initBuffers(vertexPositions, vertexNormals, indices){
         //create and bind the current vao
         this.vao = this.gl.createVertexArray();
@@ -124,19 +134,40 @@ class RenderObject{
         this.gl.bindVertexArray(null);
     }
 
-    //rotates an instance around the rotation axis by the given angle
+    /**
+    * Rotates an instance by a certain angle around the 
+    * axis of rotation
+    *
+    * @param {vec3} rotation axis of rotation
+    * @param {float} amgle angle of rotation in degrees
+    * @param {int} instance specific instance to be rotated
+    * @return {none}
+    */
     rotate(rotationAxis, angle, instance){
         var rotation = this.instances[instance].rotation;
         mat4.rotate(rotation, rotation, degToRad(angle), rotationAxis);
     }
 
-    //moves an instance around
+    /**
+    * translates an instance by a given vector
+    *
+    * @param {vec3} translationVector vector to move by
+    * @param {int} instance specific instance to be translated
+    * @return {none}
+    */
     translate(translationVector, instance){
         var position = this.instances[instance].position;
         vec3.add(position, position, translationVector);
     }
 
-    //changes the instance size along the specified axis
+    /**
+    * translates an instance by a given vector
+    *
+    * @param {vec3} scaleAxis the axis to be scaled by
+    * @param {float} scaleFactor amount to be scaled by
+    * @param {int} instance specific instance to be translated
+    * @return {none}
+    */
     scale(scaleAxis, scaleFactor, instance){
         var scale = this.instances[instance].scale;
         if(scaleAxis[0] === 1){
@@ -150,7 +181,12 @@ class RenderObject{
         }
     }
 
-    //updates the buffer data with the new transforms, normals and colours
+    /**
+    * updates all dynamic buffer data for the instances
+    *
+    * @param {none}
+    * @return {none}
+    */
     updateBufferData(){
         //update the buffer
         var transforms = [];
@@ -188,7 +224,14 @@ class RenderObject{
         this.instanceBufferData.normal = flatten(normalMats);
     }
 
-    //adds new instance to render
+    /**
+    * adds a new instance to render as long as the 
+    * current amount of instances is less than the max
+    * render amount
+    *
+    * @param {object} instance newly added instance
+    * @return {none}
+    */
     addInstance(instance){
         if(this.instances.length < this.max){
             this.instances.push(instance)
@@ -198,7 +241,12 @@ class RenderObject{
         }
     }
 
-    //calculate the centroid of an objects vertex positions
+    /**
+    * calculates the centroid of the object
+    *
+    * @param {none}
+    * @return {none}
+    */
     getCentroid(){  
         var centroid = vec3.fromValues(0, 0, 0);
         var average = 1.0 / (this.vertexPositions.length / 3.0);

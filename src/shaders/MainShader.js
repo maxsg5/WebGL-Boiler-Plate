@@ -92,6 +92,6 @@ class MainShader extends ShaderProgram{
         };
 
         //validates info of shader program
-        this.checkInfo(this.info.attribs, this.info.uniforms);
+        this.checkInfo();
     }
 }

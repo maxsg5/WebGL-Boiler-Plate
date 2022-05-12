@@ -9,6 +9,12 @@ class Light{
         this.shader = shader;
     }
 
+    /**
+    * updates light uniforms
+    *
+    * @param {vec3} cameraPos current camera position
+    * @return {none}
+    */
     update(cameraPos){
         this.cameraPos = cameraPos;
 

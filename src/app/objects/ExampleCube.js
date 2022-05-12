@@ -80,7 +80,13 @@ class ExampleCube extends RenderObject{
         this.initBuffers(this.vertexPositions, this.vertexNormals, this.indices);
     }
 
-    //set specific instance uniforms and buffer data
+    /**
+    * sets this objects uniforms and buffer data
+    *
+    * @param {mat4} projection projection matrix
+    * @param {mat4} view view matrix
+    * @return {none}
+    */
     updateInstances(projection, view){
 
         //set uniforms
@@ -90,6 +96,13 @@ class ExampleCube extends RenderObject{
         //update our buffer data for dynamic rendering
         this.updateBufferData();
     }
+
+    /**
+    * updates this objects uniforms and renders all instances
+    *
+    * @param {none}
+    * @return {none}
+    */
 
     renderInstances(){
         //use our shader program

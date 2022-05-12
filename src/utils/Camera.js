@@ -21,6 +21,12 @@ class Camera{
         this.init();
     }
 
+    /**
+    * sets up keypresses for camera movement
+    *
+    * @param {none}
+    * @return {none} 
+    */
     init(){
         document.addEventListener("keydown", (e) => {
             e.preventDefault();
@@ -53,6 +59,13 @@ class Camera{
         });
     }
 
+    /**
+    * moves the camera around the scene using a front, and right vector
+    * as well as two euler angles pitch and yaw
+    *
+    * @param {float} deltaTime frame rate
+    * @return {none} 
+    */
     move(deltaTime){
 
         if(this.pitch > 89.0){
@@ -113,6 +126,13 @@ class Camera{
 
     }
 
+    /**
+    * gets the current view matrix from the camera 
+    * vectors
+    *
+    * @param {none}
+    * @return {mat4} view matrix
+    */
     viewMatrix(){
         var view = mat4.create();
         var front = vec3.create();

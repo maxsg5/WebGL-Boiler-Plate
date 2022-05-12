@@ -3,7 +3,13 @@ class App{
         this.initState();
     }
 
-    //initialize our application
+    /**
+     * Inits the state of the current webgl app such as getting 
+     * the html canvas and making sure webl will work
+     *
+     * @param {none} 
+     * @return {none}
+     */
     initState(){
         console.log("Initializing application");
     
@@ -20,12 +26,16 @@ class App{
 
         console.log("Initialization finished\n");
     }
-
  
 
-    //runs once on app startup
-    //you can add new objects to render here as well and perform 
-    //any intitial updates 
+    /**
+     * Runs once on app start, this method is designed to perform actions
+     * only required once such as adding new shaders, cameras, starting objects,
+     * lights etc
+     *
+     * @param {none} 
+     * @return {none}
+     */
     onStart(){
         console.log("Starting application\n");
 
@@ -81,8 +91,13 @@ class App{
         );
     }
 
-    //start of the frame, things that happen before the 
-    //frame is updated go here
+    /**
+     * Prepares the frame for rendering, here we set the background colour,
+     * set any universal parameters for rendering and clear the desired buffers
+     *
+     * @param {none} 
+     * @return {none}
+     */
     startFrame(){
         //background colour
         this.gl.clearColor(0.5, 0.5, 0.5, 1.0);
@@ -96,8 +111,13 @@ class App{
         this.gl.depthFunc(this.gl.LEQUAL);
     }
 
-    //runs every frame, updating objects and moving around 
-    //goes in here
+    /**
+     * Runs every frame, moving the camera updating object instances and uniforms, 
+     * dynamically changing rendering settings happen here
+     *
+     * @param {float} deltaTime the frame rate
+     * @return {none}
+     */
     update(deltaTime){
         //update render time
         this.deltaTime = deltaTime;
@@ -156,15 +176,24 @@ class App{
         this.light.update(this.camera.position);
     }
 
-    //render calls go here
+    /**
+    * Renders objects to the canvas, all render calls will 
+    * happen here
+    *
+    * @param {none} 
+    * @return {none}
+    */
     render(){
         //render our cubes
         this.exampleCube.renderInstances();
     }
 
-    
-
-    //end of the frame, can add post processing here
+    /**
+     * End of the current frame, can add post processing here
+     *
+     * @param {none} 
+     * @return {none}
+     */
     endFrame(){
 
     }
