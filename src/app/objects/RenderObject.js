@@ -161,7 +161,7 @@ class RenderObject{
     }
 
     /**
-    * translates an instance by a given vector
+    * scales an instance by a given vector
     *
     * @param {vec3} scaleAxis the axis to be scaled by
     * @param {float} scaleFactor amount to be scaled by
