@@ -40,7 +40,18 @@
     
 
 
-
+    <!-- ColorPicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script>
+        let colorIndicator = document.getElementById('color-indicator');
+        const colorPicker = new iro.ColorPicker("#color-picker", {
+            width:180, color: "#fff"
+        });
+        colorPicker.on('color:change', function(color) {
+            colorIndicator.style.backgroundColor = color.hexString;
+        });
+    </script>
+    
     <!-- Libraries -->
     <script src="libs/gl-matrix.js" type="text/javascript"></script>
 
@@ -64,17 +75,7 @@
      <!-- Main JS file -->
     <script src="src/main.js" type="text/javascript"></script>
 
-    <!-- ColorPicker JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-    <script>
-        let colorIndicator = document.getElementById('color-indicator');
-        const colorPicker = new iro.ColorPicker("#color-picker", {
-            width:180, color: "#fff"
-        });
-        colorPicker.on('color:change', function(color) {
-            colorIndicator.style.backgroundColor = color.hexString;
-        });
-    </script>
+    
 
   </body>
 </html>

@@ -83,9 +83,9 @@ class App{
             //rotation matrix for the instance, when rotating this is what is updated
             rotation: mat4.create(),
             //initial rotation angle of the object, if you dont want the object to rotate make this 0
-            theta: degToRad(0),
+            theta: degToRad(90),
             //position of the object in world space
-            position: vec3.fromValues(-5, 0, 0),
+            position: vec3.fromValues(-5, 0, -15),
             //speed of object
             speed: 2.0,
             //size of the object
@@ -191,6 +191,22 @@ class App{
                 this.exampleCube.scale(vec3.fromValues(1, 1, 1), 1 + cube.scaleFactor, i);
             }
         }
+
+        //give our pyramid some new transformation data
+        var pyramid = this.examplePyramid.instances[0];
+        if(pyramid.type === "examplePyramid"){
+            //rotate
+            this.examplePyramid.rotate(vec3.fromValues(0, 1, 0), 30.0 * deltaTime, 0);
+        }
+
+        //change the color of the pyramid to a color from our color selector
+        // var color = colorPicker.colors[0].$;
+        // var rgb = HSVtoRGB(color.h, color.s, color.v);
+        // console.log(rgb);
+        // this.examplePyramid.instances[0].colour = vec3.fromValues(rgb.r, rgb.g, rgb.b);
+        // console.log(color);
+        //console.log(color.h + " " + color.s + " " + color.v);
+
 
         //update our example cubes with whatever new transforms we did above
         //this method will update our instances with whatever action is performed above
