@@ -19,7 +19,7 @@ class ExamplePyramid extends RenderObject{
             // Left face
             0.0,  1.0,  0.0,
             -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0 
+            -1.0, -1.0,  1.0
 
         ];
 
@@ -45,10 +45,10 @@ class ExamplePyramid extends RenderObject{
 
         //create the vertex indices of a pyramid
         this.indices = [
-            0, 1, 2,     0, 2, 3,    // Front face
-            4, 5, 6,     4, 6, 7,    // Right face
-            8, 9, 10,    8, 10, 11,  // Back face
-            12, 13, 14,  12, 14, 15, // Left face
+            0, 1, 2,     3, 4, 5,   // front
+            6, 7, 8,     9, 10, 11,  // right
+            12, 13, 14,  15, 16, 17, // back
+            18, 19, 20,  21, 22, 23  // left
         ];
 
         this.initBuffers(this.vertexPositions, this.vertexNormals, this.indices);
