@@ -1,35 +1,122 @@
-canvas{
-  position: absolute;
-  top: 5;
-  left: 0;
-  border-width: 10px;
-  border-style: ridge;
-  border-color: #555555;
+/* MOBILE CSS */
+@media only screen and (max-width: 1512px) {
+    .app {  
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, 1fr);
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+          "webgl"
+          "tools";
+      }
+
+    canvas{
+        /* position: absolute;
+        top: 5;
+        left: 0; */
+        border-width: 10px;
+        border-style: ridge;
+        border-color: #555555;
+        grid-area: webgl;
+    }
+
+    #toolsPanel{
+        /* move panel to the right */
+        /* position:absolute;  */
+        /* right:5em; */
+        /* border-width: 10px; */
+        /* border-style: ridge; */
+        /* border-color: #555555; */
+        background-color: rgb(0, 0, 0);
+        grid-area: tools;
+    }
+}
+/* END MOBILE CSS */
+
+
+.app {  
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    grid-template-rows: 1fr;
+    gap: 0px px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "webgl tools";
 }
 
-#toolsPanel{
-    /* move panel to the right */
-    position:absolute; 
-    right:5em;
+canvas{
     border-width: 10px;
     border-style: ridge;
     border-color: #555555;
-    background-color: rgb(0, 0, 0);
+    grid-area: webgl;
 }
 
-.color-picker{
-    position: relative;
+#toolsPanel{
+    background-color: rgb(0, 0, 0);
+    grid-area: tools;
+    display: grid;
+    grid-template-columns: 1fr; 
+    grid-template-rows: 1fr 1fr;
+    gap: 10px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "coord"
+      "color";
 }
-.color-indicator{
-    display: inline-block;
-    width: 200px;
-    height: 200px;
-    background-color: #fff;
-    border-radius: 20px;
-    vertical-align: middle;
+
+#coordinateTool{
+    grid-area: coord;
+    display: flex;
+    justify-content: center;
 }
-#color-picker{
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 40px;
+
+#colorPickerTool{
+    grid-area: color;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    background-color: #eeeeee;
+    
 }
+
+#rinput{
+    width:14%;
+    vertical-align: right;
+    align-self: center;
+}
+#ginput{
+    width:14%;
+    vertical-align: right;
+    align-self: center;
+
+}
+#binput{
+    width:14%;
+    vertical-align: right;
+    align-self: left;
+
+}
+
+#colorDisplay{
+    border-style: solid;
+    border-width: 5px;
+    border-color: #000000;
+    border-radius: 5px;
+    margin-right: 150px;
+    margin-bottom: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: #555555;
+}
+
+h3{
+    color: #000000;
+}
+
+  
+
+
+
